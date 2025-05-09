@@ -1,6 +1,12 @@
 
 # Matrix Multiplication Implementing Using a Systolic Architecture 
 
+This project implements a scalable systolic array architecture for computing matrix multiplication on square matrices of configurable size 𝑀×𝑀, It uses a grid of multiply-and-accumulate processing elements (PEs), arranged such that data flows horizontally and vertically through the array in a pipelined and synchronized fashion. This enables high-throughput and efficient parallel computation. 
+
+
+Systolic Array Architecture Design:
+![alt text](docs/Systolic_array_1.jpg)
+
 
 ## Systolic Array Design
 
@@ -20,6 +26,7 @@
 - `rdy_in`, held high by the accelerator when it is ready to take a new input
 - `c`, 2D array of the matrix C
 - `vld_out`, held high by the accelerator when its output is ready
+- `rdy_in`, held high by the accelerator when it is ready to take a new input
 
 ## Multiply and Accumulate Processing elements
 
@@ -32,7 +39,6 @@
 
 
 ### Outputs:
-- `rdy_in`, held high by the accelerator when it is ready to take a new input
 - `c`, result of multiply and accumulate
 - `a_out`, pass input a. This is necessary for passing a to the processing element to its right
 - `b_out`, pass input a. This is necessary for passing b to the processing element to its bottom
@@ -42,20 +48,4 @@
 ## Testbench & Simulation
 
 
-### Simulate with Verilator, Manually
-
-
-
-### Simulate with Verilator, Automatically
-
-
-### Simulate with Icarus (iverilog), Manually
-
-
-
-### Simulate with Icarus (iverilog), Automatically
-
-
-## Testbench Features
-
-# synthesis and Waveform
+## synthesis and Waveform
