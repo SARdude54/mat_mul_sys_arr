@@ -7,6 +7,7 @@ This project implements a scalable systolic array architecture for computing mat
 Systolic Array Architecture Design:
 ![alt text](docs/Systolic_array_1.jpg)
 
+This image gives a simple illustration of how the systolic array architecture operates. Matrix A feeds in each of its rows as a stream padded with zeros. Likewise, matrix B feeds in each of its colunns as a stream padded with zeros. Zero padding for each stream is essential to keep the matrix pipeline synchronous. Each stream will pass in the same value to its neighboring processing element. Every processing element will multiply a and b and it add it to its previous result. The final result is an element for matrix C. 
 
 ## Systolic Array Design
 
