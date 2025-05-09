@@ -1,29 +1,38 @@
 `timescale 1ps/1ps
 
+
+/* This processing element is a multiply and accumulate. 
+   Each processing element must pass a and b as an ouput in order
+   to feed to neighboring multiply and accumulate modules
+
+*/
 module mat_acc(
     input logic CLK,
     input logic rst,
-    input logic vld_in,
-    input logic rdy_out,
+    input logic en,
     input logic [7:0] a,
     input logic [7:0] b,
-    output logic [7:0] c,
-    output vld_out,
-    output rdy_in
+    output logic [15:0] c,
+    output logic [7:0] a_out,
+    output logic [7:0] b_out
 );
 
-logic [7:0] cij;
+// register for matrix output element c[i][j]
+logic [15:0] cij; 
 
-
-always_ff @(posedge CLK) begin : blockName
+// mult and acc register
+always_ff @(posedge CLK) begin
     if (rst) begin
         cij <= 0;
-    end else begin
+    end else if (en) begin
         cij <= cij + a * b;
     end   
 end
 
+// assign outputs
 assign c = cij;
+assign a_out = a; // pass a to next element
+assign b_out = b; // pass b to next element
     
 endmodule
 
