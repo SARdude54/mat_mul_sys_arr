@@ -27,12 +27,12 @@ always_ff @(posedge CLK) begin
     end else if (en) begin
         cij <= cij + a * b;
     end   
+    a_out <= a;
+    b_out <= b;
 end
 
 // assign outputs
 assign c = cij;
-assign a_out = a; // pass a to next element
-assign b_out = b; // pass b to next element
     
 endmodule
 

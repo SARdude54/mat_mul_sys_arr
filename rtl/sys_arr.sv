@@ -23,8 +23,8 @@ module sys_arr #(
 );
 
 // intermediate wire to pass a and b to next processing element
-logic [7:0] a_wire [0:M-1];
-logic [7:0] b_wire [0:M-1];
+logic [7:0] a_wire [0:M-1][0:M-1];
+logic [7:0] b_wire [0:M-1][0:M-1];
 
 // enable using handshake signals
 logic en;
@@ -36,13 +36,13 @@ logic [COUNT_WIDTH:0] cycle_count; // cycle count of MxM matrix is diagonal coun
 logic vld_out_reg;
 
 // counter regiester to track cycles
-always_ff @(posedge CLK or posedge rst) begin
+always_ff @(posedge CLK) begin
     if (rst) begin
         cycle_count <= 0;
         vld_out_reg <= 0;
     end else if (en) begin
         cycle_count <= cycle_count + 1;
-        vld_out_reg <= (cycle_count == 2*M - 2); // valid out once done
+        vld_out_reg <= (cycle_count == 2*M + 1); // valid out once done
     end else begin
         vld_out_reg <= 0;
     end
@@ -50,7 +50,7 @@ end
 
 // set output handshake signals
 assign vld_out = vld_out_reg;
-assign rdy_in = (cycle_count < 2*M - 2);
+assign rdy_in = (cycle_count < 2*M + 1);
 
 
 // each processing element will be an instance of a multiply and accumulate module
@@ -68,22 +68,22 @@ generate
                 .a(a[0]),
                 .b(b[0]),
                 .c(c[0][0]),
-                .a_out(a_wire[0]),
-                .b_out(b_wire[0])
-            );
-
+                .a_out(a_wire[0][0]),
+                .b_out(b_wire[0][0])
+            	);
+	    end
             // edge case: first row
             else if (i == 0 && j > 0 && j < M) begin
                 mat_acc mat_acc(
                 .CLK(CLK),
                 .rst(rst),
                 .en(en),
-                .a(a_wire[j]), // feed in intermediate a wire
-                .b(b[0]), // b stream goes into top row
+                .a(a_wire[0][j-1]), // feed in intermediate a wire
+                .b(b[j]), // b stream goes into top row
                 .c(c[0][j]), // output the top row of C
-                .a_out(a_wire[j+1]), // set a wire for next column iteration
-                .b_out(b_wire[0]) // set b wire for next row iteration
-            );
+                .a_out(a_wire[0][j]), // set a wire for next column iteration
+                .b_out(b_wire[0][j]) // set b wire for next row iteration
+            	);
             end
 
             // edge case: first column
@@ -92,28 +92,28 @@ generate
                 .CLK(CLK),
                 .rst(rst),
                 .en(en),
-                .a(a[0]), // feed in a
-                .b(b_wire[i]), // feed intermediate b wire
+                .a(a[i]), // feed in a
+                .b(b_wire[i-1][0]), // feed intermediate b wire
                 .c(c[i][0]), // set output for C
-                .a_out(a_wire[0]), // set a wire for next column
-                .b_out(b_wire[i+1]) // set b wire for next row
-            );
+                .a_out(a_wire[i][0]), // set a wire for next column
+                .b_out(b_wire[i][0]) // set b wire for next row
+            	);
             end
 
             // all other processing elemenets
-            end else begin
+            else begin
                 mat_acc mat_acc(
                 .CLK(CLK),
                 .rst(rst),
                 .en(en),
-                .a(a_wire[j]),
-                .b(b_wire[i]),
+                .a(a_wire[i][j-1]),
+                .b(b_wire[i-1][j]),
                 .c(c[i][j]),
-                .a_out(a_wire[j+1]),
-                .b_out(b_wire[i+1])
+                .a_out(a_wire[i][j]),
+                .b_out(b_wire[i][j])
             );
             end
-            end
+    	end
             
     end
 endgenerate
