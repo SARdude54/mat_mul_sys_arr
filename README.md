@@ -47,11 +47,14 @@ This image gives a simple illustration of how the systolic array architecture op
 
 
 ## Testbench & Simulation
-Systolic Array Architecture Design:
+Test 1 waveform:
 ![alt text](docs/SYS_Waveform1.png)
 
-Systolic Array Architecture Design:
+The first test does matrix multiplication between two 3x3 identity matrices. This is a simple case that gives us the desired results. 
+
+Test 2 waveform:
 ![alt text](docs/SYS_Waveform2.png)
 
+The second test is checks does a matrix multiplication between two different 3x3 matrices. The desired was also produced for this case. 
 
-## synthesis and Waveform
+## Synthesis and Waveform
