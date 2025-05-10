@@ -9,7 +9,8 @@ Systolic Array Architecture Design:
 
 This image gives a simple illustration of how the systolic array architecture operates. Matrix A feeds in each of its rows as a stream padded with zeros. Likewise, matrix B feeds in each of its colunns as a stream padded with zeros. Zero padding for each stream is essential to keep the matrix pipeline synchronous. Each stream will pass in the same value to its neighboring processing element. Every processing element will multiply a and b and it add it to its previous result. The final result is an element for matrix C. 
 
-## Systolic Array Design
+## Main module
+The main modules wraps around the feed modules and systolic array module
 
 ### Inputs:
 - `clk`, assume positive edge triggers
@@ -27,9 +28,38 @@ This image gives a simple illustration of how the systolic array architecture op
 - `rdy_in`, held high by the accelerator when it is ready to take a new input
 - `c`, 2D array of the matrix C
 - `vld_out`, held high by the accelerator when its output is ready
-- `rdy_in`, held high by the accelerator when it is ready to take a new input
 
-## Multiply and Accumulate Processing elements
+## Feed modules
+Delay module is simply a register that synchronously passes a_in to a_out every clock
+
+Feed module feeds the stream of inputs to the systolic array. Based on the first image, each row of Matrix a and column of Matrix B is streamed in to the systolic array. This module is responsible for feeding in the stream to the systolic array. 
+
+### Inputs
+- `clk`, assume positive edge triggers
+- `a_in`, an array stream of rows from matrix A
+
+### Outputs
+- `a_out`, an array stream of rows from matrix a
+
+
+## Systolic Array Module
+
+### Inputs:
+- `clk`, assume positive edge triggers
+- `rst`, an active high synchronous reset
+- `a`, an array stream of rows from matrix A
+- `b`, an array stream of columns from matrix B
+- `vld_in`, handshake valid in
+    - goes high when a and b is valid, indicating to start to using the systolic array
+- `rdy_out`, ready out
+    - goes high when the matrix multiplication accelerator's output has successfully been read from 
+
+### Outputs:
+- `rdy_in`, held high by the accelerator when it is ready to take a new input
+- `c`, 2D array of the matrix C
+- `vld_out`, held high by the accelerator when its output is ready
+
+## Multiply and Accumulate Processing Elements Modules
 
 ### Inputs:
 - `clk`, assume positive edge triggers
