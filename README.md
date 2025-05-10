@@ -47,6 +47,11 @@ This image gives a simple illustration of how the systolic array architecture op
 
 
 ## Testbench & Simulation
+Systolic Array Architecture Design:
+![alt text](docs/SYS_Waveform1.png)
+
+Systolic Array Architecture Design:
+![alt text](docs/SYS_Waveform2.png)
 
 
 ## synthesis and Waveform
