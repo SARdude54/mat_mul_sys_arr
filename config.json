@@ -1,0 +1,12 @@
+{
+	"DESIGN_NAME": "main",
+	"VERILOG_FILES": ["rtl/sp_buf.sv", "rtl/main.sv", "rtl/feed.sv", "rtl/mat_acc.sv", "rtl/sys_arr.sv"],
+	"CLOCK_PERIOD": 50,
+	"CLOCK_PORT": "CLK",
+	"FP_PDN_VOFFSET": 7,
+	"FP_PDN_HOFFSET": 7,
+	"FP_PDN_SKIPTRIM": true,
+	"RUN_POST_GRT_RESIZER_TIMING": true,
+	"RUN_POST_GRT_DESIGN_REPAIR": true,
+	"SYNTH_AUTONAME": true
+}

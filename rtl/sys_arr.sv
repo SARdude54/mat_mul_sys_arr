@@ -15,12 +15,42 @@ module sys_arr #(
     input logic rst,
     input logic vld_in,
     input logic rdy_out,
-    input logic [7:0] a [0:M-1],
-    input logic [7:0] b [0:M-1],
-    output logic [15:0] c [0:M-1][0:M-1],
+    input logic [(8*M-1):0] a,
+    input logic [(8*M-1):0] b,
+    output logic [(16*M*M-1):0] c,
     output vld_out,
     output rdy_in
 );
+
+logic [(8*M-1):0] int_a;
+logic [(8*M-1):0] int_b;
+logic [7:0] in_a_arr[0:(M-1)];
+logic [7:0] in_b_arr[0:(M-1)];
+logic [15:0] out_arr[0:(M-1)][0:(M-1)];
+
+logic [(16*M*M-1):0] int_c;
+
+always_comb
+begin
+    int_a = a;
+    int_b = b;
+    int_c = 0;
+    for (int i = 0; i < M; i++)
+    begin
+        in_a_arr[i] = int_a[7:0];
+        int_a = int_a >> 8;
+        in_b_arr[i] = int_b[7:0];
+        int_b = int_b >> 8;
+
+        for (int j = 0; j < M; j++)
+        begin
+            int_c[15:0] = out_arr[i][j];
+            if (i*M+j < M*M-1)
+                int_c = int_c << 16;
+        end
+    end
+    c = int_c;
+end
 
 // intermediate wire to pass a and b to next processing element
 logic [7:0] a_wire [0:M-1][0:M-1];
@@ -65,9 +95,9 @@ generate
                 .CLK(CLK),
                 .rst(rst),
                 .en(en),
-                .a(a[0]),
-                .b(b[0]),
-                .c(c[0][0]),
+                .a(in_a_arr[0]),
+                .b(in_b_arr[0]),
+                .c(out_arr[0][0]),
                 .a_out(a_wire[0][0]),
                 .b_out(b_wire[0][0])
             	);
@@ -79,8 +109,8 @@ generate
                 .rst(rst),
                 .en(en),
                 .a(a_wire[0][j-1]), // feed in intermediate a wire
-                .b(b[j]), // b stream goes into top row
-                .c(c[0][j]), // output the top row of C
+                .b(in_b_arr[j]), // b stream goes into top row
+                .c(out_arr[0][j]), // output the top row of C
                 .a_out(a_wire[0][j]), // set a wire for next column iteration
                 .b_out(b_wire[0][j]) // set b wire for next row iteration
             	);
@@ -92,9 +122,9 @@ generate
                 .CLK(CLK),
                 .rst(rst),
                 .en(en),
-                .a(a[i]), // feed in a
+                .a(in_a_arr[i]), // feed in a
                 .b(b_wire[i-1][0]), // feed intermediate b wire
-                .c(c[i][0]), // set output for C
+                .c(out_arr[i][0]), // set output for C
                 .a_out(a_wire[i][0]), // set a wire for next column
                 .b_out(b_wire[i][0]) // set b wire for next row
             	);
@@ -108,7 +138,7 @@ generate
                 .en(en),
                 .a(a_wire[i][j-1]),
                 .b(b_wire[i-1][j]),
-                .c(c[i][j]),
+                .c(out_arr[i][j]),
                 .a_out(a_wire[i][j]),
                 .b_out(b_wire[i][j])
             );
