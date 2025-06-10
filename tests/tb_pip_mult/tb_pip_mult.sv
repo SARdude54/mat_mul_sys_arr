@@ -30,6 +30,9 @@ module tb_pip_mult();
     initial begin
         $display("Starting Pipelined Wallace Multiplier Test...");
 
+        $dumpfile("tb_sys.vcd");
+	    $dumpvars(0);
+
         // Initialize
         a = 0;
         b = 0;
