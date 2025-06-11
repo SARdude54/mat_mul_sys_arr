@@ -15,8 +15,8 @@ The main modules wraps around the feed modules and systolic array module
 ### Inputs:
 - `clk`, assume positive edge triggers
 - `rst`, an active high synchronous reset
-- `a`, an array stream of rows from matrix A
-- `b`, an array stream of columns from matrix B
+- `a`, an array stream of rows from matrix A (flattened)
+- `b`, an array stream of columns from matrix B (flattened)
 - `vld_in`, handshake valid in
     - goes high when a and b is valid, indicating to start to using the systolic array
 - `rdy_out`, ready out
@@ -26,7 +26,7 @@ The main modules wraps around the feed modules and systolic array module
 
 ### Outputs:
 - `rdy_in`, held high by the accelerator when it is ready to take a new input
-- `c`, 2D array of the matrix C
+- `c`, 2D array of the matrix C (flattened)
 - `vld_out`, held high by the accelerator when its output is ready
 
 ## Feed modules
@@ -36,10 +36,10 @@ Feed module feeds the stream of inputs to the systolic array. Based on the first
 
 ### Inputs
 - `clk`, assume positive edge triggers
-- `a_in`, an array stream of rows from matrix A
+- `a_in`, an array stream of rows from matrix A (flattened)
 
 ### Outputs
-- `a_out`, an array stream of rows from matrix a
+- `a_out`, an array stream of rows from matrix a (flattened)
 
 
 ## Systolic Array Module
@@ -47,8 +47,8 @@ Feed module feeds the stream of inputs to the systolic array. Based on the first
 ### Inputs:
 - `clk`, assume positive edge triggers
 - `rst`, an active high synchronous reset
-- `a`, an array stream of rows from matrix A
-- `b`, an array stream of columns from matrix B
+- `a`, an array stream of rows from matrix A (flattened)
+- `b`, an array stream of columns from matrix B (flattened)
 - `vld_in`, handshake valid in
     - goes high when a and b is valid, indicating to start to using the systolic array
 - `rdy_out`, ready out
@@ -56,7 +56,7 @@ Feed module feeds the stream of inputs to the systolic array. Based on the first
 
 ### Outputs:
 - `rdy_in`, held high by the accelerator when it is ready to take a new input
-- `c`, 2D array of the matrix C
+- `c`, 2D array of the matrix C (flattened into 1D vector)
 - `vld_out`, held high by the accelerator when its output is ready
 
 ## Multiply and Accumulate Processing Elements Modules
@@ -68,13 +68,13 @@ Feed module feeds the stream of inputs to the systolic array. Based on the first
 - `b`, an 8 bit signal for an element from Matrix B
 - `en`, enable computing multiply and accumulate 
 
-
 ### Outputs:
 - `c`, result of multiply and accumulate
 - `a_out`, pass input a. This is necessary for passing a to the processing element to its right
 - `b_out`, pass input a. This is necessary for passing b to the processing element to its bottom
 
-
+## Synthesis
+In order to pass synthesis successfully, none of the inputs or outputs of all modules can be multi-dimensional arrays; this is the case for most of the modules in our design. For the top (main) module, the values of the two input matrices were fed in one at a time into a buffer, which can then be read multiple values at a time (i.e. a buffer with serial input, parallel output). The array inputs/outputs of the internal modules (buffer, feed, and systolic array) are flattened into 1D vectors. The synthesis successfully completes. 
 
 ## Testbench & Simulation
 Test 1 waveform:
@@ -85,6 +85,6 @@ The first test does matrix multiplication between two 3x3 identity matrices. Thi
 Test 2 waveform:
 ![alt text](docs/SYS_Waveform2.png)
 
-The second test is checks does a matrix multiplication between two different 3x3 matrices. The desired was also produced for this case. 
+The second test is checks does a matrix multiplication between two different 3x3 matrices. The desired result was also produced for this case. 
 
-## Synthesis and Waveform
+
