@@ -23,7 +23,7 @@ module mat_acc(
     logic [15:0] cij;
 
     // Pipelined multiplier
-    pip_multiplier u_mult (
+    /*pip_multiplier u_mult (
         .clk(CLK),
         .rst(rst),
         .a(a),
@@ -31,14 +31,15 @@ module mat_acc(
         .valid_in(valid_in),
         .valid_out(valid_out),
         .product(product)
-    );
+    );*/
 
     // Accumulator that add product when valid_out is high
     always_ff @(posedge CLK or posedge rst) begin
         if (rst) begin
             cij <= 0;
-        end else if (en && valid_out) begin
-            cij <= cij + product;
+        end else if (en) begin
+            //cij <= cij + product;
+            cij <= cij + a * b;
         end
     end
 

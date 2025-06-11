@@ -78,7 +78,7 @@ initial begin
 
 	shortint c_out[0:2][0:2];
 
-	sys_test(a_in, b_in, c_out);
+	//sys_test(a_in, b_in, c_out);
 
 	//General test
 	a_in = '{
@@ -93,7 +93,7 @@ initial begin
 		'{2, 0, 1}
 	};
 
-	//sys_test(a_in, b_in, c_out);
+	sys_test(a_in, b_in, c_out);
 
 	$finish();
 end

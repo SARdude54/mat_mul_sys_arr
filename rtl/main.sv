@@ -42,9 +42,9 @@ module main #(parameter M=3) (
 	always_comb
 	begin
 		sys_out_int = sys_out;
-		for (int i = 0; i < M; i++)
+		for (int i = M - 1; i >= 0; i--)
 		begin
-			for (int j = 0; j < M; j++)
+			for (int j = M - 1; j >= 0; j--)
 			begin
 				sys_out_arr[i][j] = sys_out_int[15:0];
 				sys_out_int = sys_out_int >> 16;

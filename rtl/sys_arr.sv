@@ -37,9 +37,9 @@ begin
     int_c = 0;
     for (int i = 0; i < M; i++)
     begin
-        in_a_arr[i] = int_a[7:0];
+        in_a_arr[M - i - 1] = int_a[7:0];
         int_a = int_a >> 8;
-        in_b_arr[i] = int_b[7:0];
+        in_b_arr[M - i - 1] = int_b[7:0];
         int_b = int_b >> 8;
 
         for (int j = 0; j < M; j++)

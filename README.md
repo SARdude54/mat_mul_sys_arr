@@ -78,7 +78,12 @@ In order to pass synthesis successfully, none of the inputs or outputs of all mo
 
 ## Testbench & Simulation
 Test 1 waveform:
-![alt text](docs/systolic_arr_identity.png)
+![alt text](docs/sim_identity.png)
 
 The first test does matrix multiplication between two 3x3 identity matrices. This is a simple case that gives us the desired results. 
+
+Test 2 waveform:
+![alt text](docs/sim_example.png)
+
+The second test is checks does a matrix multiplication between two arbitrarily chosen 3x3 matrices. The desired result was also produced for this case.
 

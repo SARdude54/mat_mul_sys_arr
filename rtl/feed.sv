@@ -37,7 +37,7 @@ module feed #(parameter M=3) (
 		int_out = 0;
 		for (int i = 0; i < M; i++)
 		begin
-			in_arr[i] = int_in[7:0];
+			in_arr[M - i - 1] = int_in[7:0];
 			int_in = int_in >> 8;
 
 			int_out[7:0] = out_arr[i];
