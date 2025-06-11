@@ -82,71 +82,91 @@ end
 assign vld_out = vld_out_reg;
 assign rdy_in = (cycle_count < 2*M + 1);
 
+// valid signals per processing element
+logic valid_in_wire[0:M-1][0:M-1];
+logic valid_out_wire[0:M-1][0:M-1];
 
-// each processing element will be an instance of a multiply and accumulate module
+
+// generate block that instantiates the mat_acc processing element
 genvar i, j;
 generate
     for (i = 0; i < M; i = i + 1 ) begin
         for (j = 0; j < M ; j = j + 1 ) begin
 
+            logic local_valid;
+
             // edge case: C[0][0] (top left)
             if (i == 0 && j == 0) begin
+                assign local_valid = vld_in;
                 mat_acc mat_acc(
-                .CLK(CLK),
-                .rst(rst),
-                .en(en),
-                .a(in_a_arr[0]),
-                .b(in_b_arr[0]),
-                .c(out_arr[0][0]),
-                .a_out(a_wire[0][0]),
-                .b_out(b_wire[0][0])
-            	);
-	    end
+                    .CLK(CLK),
+                    .rst(rst),
+                    .en(en),
+                    .valid_in(local_valid),
+                    .valid_out(valid_out_wire[i][j]),
+                    .a(in_a_arr[0]),
+                    .b(in_b_arr[0]),
+                    .c(out_arr[0][0]),
+                    .a_out(a_wire[0][0]),
+                    .b_out(b_wire[0][0])
+                );
+            end
             // edge case: first row
             else if (i == 0 && j > 0 && j < M) begin
+                assign local_valid = valid_out_wire[i][j-1]; // note: using registered output!
                 mat_acc mat_acc(
-                .CLK(CLK),
-                .rst(rst),
-                .en(en),
-                .a(a_wire[0][j-1]), // feed in intermediate a wire
-                .b(in_b_arr[j]), // b stream goes into top row
-                .c(out_arr[0][j]), // output the top row of C
-                .a_out(a_wire[0][j]), // set a wire for next column iteration
-                .b_out(b_wire[0][j]) // set b wire for next row iteration
-            	);
+                    .CLK(CLK),
+                    .rst(rst),
+                    .en(en),
+                    .valid_in(local_valid),
+                    .valid_out(valid_out_wire[i][j]),
+                    .a(a_wire[0][j-1]),
+                    .b(in_b_arr[j]),
+                    .c(out_arr[0][j]),
+                    .a_out(a_wire[0][j]),
+                    .b_out(b_wire[0][j])
+                );
             end
 
             // edge case: first column
             else if (j == 0 && i > 0 && i < M) begin
+                assign local_valid = valid_out_wire[i-1][j]; // use previous PE's valid_out
                 mat_acc mat_acc(
-                .CLK(CLK),
-                .rst(rst),
-                .en(en),
-                .a(in_a_arr[i]), // feed in a
-                .b(b_wire[i-1][0]), // feed intermediate b wire
-                .c(out_arr[i][0]), // set output for C
-                .a_out(a_wire[i][0]), // set a wire for next column
-                .b_out(b_wire[i][0]) // set b wire for next row
-            	);
+                    .CLK(CLK),
+                    .rst(rst),
+                    .en(en),
+                    .valid_in(local_valid),
+                    .valid_out(valid_out_wire[i][j]),
+                    .a(in_a_arr[i]),
+                    .b(b_wire[i-1][0]),
+                    .c(out_arr[i][0]),
+                    .a_out(a_wire[i][0]),
+                    .b_out(b_wire[i][0])
+                );
             end
 
             // all other processing elemenets
             else begin
+                assign local_valid = valid_out_wire[i-1][j-1]; // diagonally upstream
                 mat_acc mat_acc(
-                .CLK(CLK),
-                .rst(rst),
-                .en(en),
-                .a(a_wire[i][j-1]),
-                .b(b_wire[i-1][j]),
-                .c(out_arr[i][j]),
-                .a_out(a_wire[i][j]),
-                .b_out(b_wire[i][j])
-            );
+                    .CLK(CLK),
+                    .rst(rst),
+                    .en(en),
+                    .valid_in(local_valid),
+                    .valid_out(valid_out_wire[i][j]),
+                    .a(a_wire[i][j-1]),
+                    .b(b_wire[i-1][j]),
+                    .c(out_arr[i][j]),
+                    .a_out(a_wire[i][j]),
+                    .b_out(b_wire[i][j])
+                );
             end
-    	end
-            
+        end
     end
 endgenerate
+
+
+
     
 endmodule
 
